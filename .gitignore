@@ -13,6 +13,8 @@ dist/
 doc/_build/
 
 data/
+results/
 
 
 .ipynb_checkpoints/
+
