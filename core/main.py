@@ -1,7 +1,8 @@
 import descriptors
 import cv2
-import utils
 import argparse
+import numpy as np
+import notes
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -11,6 +12,4 @@ ap.add_argument("-i", "--image", required=True,
 args = ap.parse_args()
 
 img = cv2.imread(args.image)
-kp, desc = descriptors.sift(img)
-img = utils.drawKeypoints(img, kp, (100, 100, 100), 10)
-cv2.imwrite('./test.png')
+notes.find(img)
