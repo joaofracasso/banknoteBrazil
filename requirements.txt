@@ -7,8 +7,12 @@ Sphinx
 coverage
 awscli
 flake8
+tox
 python-dotenv>=0.5.1
 
 
 # backwards compatibility
 pathlib2
+
+pytorch
+tqdm
