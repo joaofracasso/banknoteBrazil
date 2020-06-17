@@ -15,4 +15,5 @@ python-dotenv>=0.5.1
 pathlib2
 
 pytorch
+torchvision
 tqdm
