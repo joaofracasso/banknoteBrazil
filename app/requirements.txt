@@ -2,3 +2,4 @@ onnx
 numpy
 torch
 torchvision
+flask

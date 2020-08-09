@@ -5,7 +5,6 @@
 click
 Sphinx
 coverage
-awscli
 flake8
 tox
 python-dotenv>=0.5.1

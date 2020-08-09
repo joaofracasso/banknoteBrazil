@@ -10,11 +10,6 @@ PROFILE = default
 PROJECT_NAME = https://github.com/joaofracasso/banknoteBrazil
 PYTHON_INTERPRETER = python
 
-ifeq (,$(shell which conda))
-HAS_CONDA=False
-else
-HAS_CONDA=True
-endif
 
 #################################################################################
 # COMMANDS                                                                      #
