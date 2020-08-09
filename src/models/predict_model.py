@@ -1,3 +1,5 @@
+import io
+
 from torchvision import models
 import torchvision.transforms as transforms
 from PIL import Image
@@ -22,3 +24,9 @@ def get_prediction(image_bytes):
     _, y_hat = outputs.max(1)
     predicted_idx = str(y_hat.item())
     return predicted_idx
+
+if __name__ == "__main__":
+    with open("/home/joaof/banknoteBrazil/src/models/10_front.jpg", 'rb') as f:
+        image_bytes = f.read()
+        tensor = get_prediction(image_bytes=image_bytes)
+        print(tensor)
