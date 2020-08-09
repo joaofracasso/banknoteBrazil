@@ -7,8 +7,8 @@ from models import Baseline
 import torch.optim as optim
 import torch.nn as nn
 
-train_path = 'data/raw/train'
-valid_path = 'data/raw/validation'
+train_path = 'data/train'
+valid_path = 'data/validation'
 
 
 def load_dataset(data_path):
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # Assuming that we are on a CUDA machine, this should print a CUDA device:
-    epochs = 100
+    epochs = 1
     print(device)
     net = Baseline()
     net.to(device)
@@ -76,4 +76,7 @@ if __name__ == "__main__":
                     f'val_loss  {running_val_loss:.4f}')
             epoch_pbar.set_description(desc)
 
-print('Finished Training')
+
+    dummy_input = torch.randn(1, 3, 32, 32)
+    torch.onnx.export(net, dummy_input, "models/banknote.onnx", verbose=True)
+    print('Finished Training')

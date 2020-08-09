@@ -4,12 +4,16 @@ from torchvision import models
 import torchvision.transforms as transforms
 from PIL import Image
 
-model = models.densenet121(pretrained=True)
-model.eval()
+import onnx
+
+import onnxruntime as ort
+import numpy as np
+
+ort_session = ort.InferenceSession('models/banknote.onnx')
 
 def transform_image(image_bytes):
-    my_transforms = transforms.Compose([transforms.Resize(255),
-                                        transforms.CenterCrop(224),
+    my_transforms = transforms.Compose([transforms.Resize([256, 256]),
+                                        transforms.RandomCrop(32, padding=4),
                                         transforms.ToTensor(),
                                         transforms.Normalize(
                                             [0.485, 0.456, 0.406],
@@ -20,10 +24,9 @@ def transform_image(image_bytes):
 
 def get_prediction(image_bytes):
     tensor = transform_image(image_bytes=image_bytes)
-    outputs = model.forward(tensor)
-    _, y_hat = outputs.max(1)
-    predicted_idx = str(y_hat.item())
-    return predicted_idx
+    outputs = ort_session.run(None, {'input.1': tensor.numpy()})
+    y_hat = np.argmax(outputs, axis=1)
+    return y_hat
 
 if __name__ == "__main__":
     with open("/home/joaof/banknoteBrazil/src/models/10_front.jpg", 'rb') as f:
