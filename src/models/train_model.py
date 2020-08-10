@@ -7,6 +7,7 @@ from models import Baseline
 import torch.optim as optim
 import torch.nn as nn
 
+
 train_path = 'data/train'
 valid_path = 'data/validation'
 
@@ -36,12 +37,13 @@ if __name__ == "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # Assuming that we are on a CUDA machine, this should print a CUDA device:
-    epochs = 1
+    epochs = 100
+    best_val_loss = 999999
     print(device)
     net = Baseline()
     net.to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(net.parameters(), lr=0.005, momentum=0.9)
     for epoch in range(epochs):
         with tqdm(total=len(load_dataset(train_path))) as epoch_pbar:
             epoch_pbar.set_description(f'Epoch {epoch}')
@@ -75,8 +77,7 @@ if __name__ == "__main__":
                     f'loss {running_loss:.4f} - ' +
                     f'val_loss  {running_val_loss:.4f}')
             epoch_pbar.set_description(desc)
-
-
-    dummy_input = torch.randn(1, 3, 32, 32)
-    torch.onnx.export(net, dummy_input, "models/banknote.onnx", verbose=True)
-    print('Finished Training')
+        if running_val_loss < best_val_loss: 
+            dummy_input = torch.randn(1, 3, 32, 32).to(device)
+            torch.onnx.export(net, dummy_input, "models/banknote_best.onnx")
+            best_val_loss = running_val_loss
