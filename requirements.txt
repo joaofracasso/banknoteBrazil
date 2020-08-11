@@ -17,3 +17,6 @@ onnxruntime
 torch
 torchvision
 tqdm
+
+flask
+netron
