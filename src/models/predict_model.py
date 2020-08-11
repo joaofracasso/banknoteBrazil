@@ -1,6 +1,5 @@
 import io
 
-from torchvision import models
 import torchvision.transforms as transforms
 from PIL import Image
 
@@ -8,6 +7,7 @@ import onnxruntime as ort
 import numpy as np
 
 ort_session = ort.InferenceSession('models/banknote_best.onnx')
+
 
 def transform_image(image_bytes):
     my_transforms = transforms.Compose([transforms.Resize([256, 256]),
@@ -26,8 +26,10 @@ def get_prediction(image_bytes):
     y_hat = np.argmax(outputs[0], axis=1)
     return y_hat.item()
 
+
 if __name__ == "__main__":
-    with open("data/validation/2reaisVerso/compressed_20_9551306.jpeg", 'rb') as f:
+    filename = "data/validation/2reaisVerso/compressed_20_9551306.jpeg"
+    with open(filename, 'rb') as f:
         image_bytes = f.read()
         tensor = get_prediction(image_bytes=image_bytes)
         print(tensor)
