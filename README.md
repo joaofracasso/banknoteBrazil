@@ -1,3 +1,4 @@
+![Python application](https://github.com/joaofracasso/banknoteBrazil/workflows/Python%20application/badge.svg)
 # banknoteBrazil: Brazilian paper money
 This repository contains a classification of Brazilian paper money.
 
