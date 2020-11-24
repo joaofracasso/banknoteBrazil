@@ -1,6 +1,8 @@
 # local package
 -e .
 
+requests
+
 # external requirements
 click
 Sphinx
