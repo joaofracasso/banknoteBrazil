@@ -22,9 +22,5 @@ def health_check():
     if request.method == 'GET':
         return jsonify({'Status': "OK"})
 
-@app.route('/model', methods=['GET'])
-def description():
-    return redirect("http://localhost:8081", code=302)
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
