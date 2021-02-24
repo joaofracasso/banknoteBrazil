@@ -25,7 +25,7 @@
 
 on:
   release:
-    types: [created]
+    types: [master]
 
 name: Deploy to Amazon ECS
 
@@ -63,10 +63,10 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: sample-app-service
-        cluster: default
-        wait-for-service-stability: true
+      - name: Create or update lambda function
+        run: | 
+          aws cloudformation deploy \
+            --stack-name discovery-lambda-stack \
+            --template-file infra/lambda.yml \
+            -- parameters infra/parameters.json
+            --capabilities CAPABILITY_NAMED_IAM

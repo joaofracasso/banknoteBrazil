@@ -1,3 +1,7 @@
 {
-    
+    "Parameters": {
+        "LambdaName" : "banknotebrazil",
+        "LambdaTimeout": "100",
+        "ImageUri": "000326655062.dkr.ecr.sa-east-1.amazonaws.com/banknotebrazil"
+    }
 }

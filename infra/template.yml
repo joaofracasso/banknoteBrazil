@@ -1,30 +1,69 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Transform: AWS::Serverless-2016-10-31
-Description: >
-  python3.8
+Description: Lambda Container
 
-  Sample SAM Template for lambda-pytorch-example
+Parameters:
+  LambdaTimeout:
+    Description:
+    Type: String
+  ImageUri:
+    Description:
+    Type: String
+
+  
 
 Resources:
-  pytorchEndpoint:
-    Type: AWS::Serverless::Function
+  Function:
+    Type: AWS::Lambda::Function
     Properties:
+      FunctionName: discovery
+      Role: !GetAtt Role.Arn
       PackageType: Image
-      MemorySize: 5000
-      Timeout: 300
-      Events:
-        ApiEndpoint:
-          Type: HttpApi
-          Properties:
-            Path: /inference
-            Method: post
-            TimeoutInMillis: 29000
-    Metadata:
-      Dockerfile: Dorfile
-      DockerContext: ./hello_world
-      DockerTag: python3.8-v1
+      Code:
+        ImageUri: !Ref ImageUri
+      Timeout: 5
 
-Outputs:
-  InferenceApi:
-    Description: "API Gateway endpoint URL for Prod stage for inference function"
-    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/inference"
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: discovery-lambda-role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: discovery-lambda-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - "cloudformation:DescribeChangeSet"
+                  - "cloudformation:DescribeStackResources"
+                  - "cloudformation:DescribeStacks"
+                  - "cloudformation:GetTemplate"
+                  - "cloudformation:ListStackResources"
+                  - "cloudwatch:*"
+                  - "ec2:DescribeSecurityGroups"
+                  - "ec2:DescribeSubnets"
+                  - "ec2:DescribeVpcs"
+                  - "events:*"
+                  - "iam:GetPolicy"
+                  - "iam:GetPolicyVersion"
+                  - "iam:GetRole"
+                  - "iam:GetRolePolicy"
+                  - "iam:ListAttachedRolePolicies"
+                  - "iam:ListRolePolicies"
+                  - "iam:ListRoles"
+                  - "iam:PassRole"
+                  - "kms:ListAliases"
+                  - "lambda:*"
+                  - "logs:*"
+                  - "tag:GetResources"
+                Resource: '*'
+      MaxSessionDuration: 3600 
