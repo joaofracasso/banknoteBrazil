@@ -2,30 +2,30 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Lambda Container
 
 Parameters:
-  LambdaTimeout:
-    Description:
+  FunctionName:
     Type: String
+    Default: banknotebrazil
   ImageUri:
-    Description:
+    Description: Path ECR
     Type: String
-
-  
+    Default: 000326655062.dkr.ecr.sa-east-1.amazonaws.com/banknotebrazil:latest
 
 Resources:
   Function:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: discovery
+      FunctionName: !Ref FunctionName
       Role: !GetAtt Role.Arn
       PackageType: Image
       Code:
         ImageUri: !Ref ImageUri
-      Timeout: 5
+      MemorySize: 5000
+      Timeout: 300
 
   Role:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: discovery-lambda-role
+      RoleName: banknotebrazil-lambda-role
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
