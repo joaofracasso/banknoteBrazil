@@ -6,10 +6,12 @@ tokenizer = AutoTokenizer.from_pretrained("model/")
 model = AutoModelForQuestionAnswering.from_pretrained("model/")
 
 def lambda_handler(event, context):
+    print(event)
 
     body = event['body']
-
+    print(body)
     question = body['question']
+    print(question)
     context = body['context']
 
     inputs = tokenizer.encode_plus(question, context,add_special_tokens=True, return_tensors="pt")

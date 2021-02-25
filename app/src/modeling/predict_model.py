@@ -6,12 +6,12 @@ from PIL import Image
 import onnxruntime as ort
 import numpy as np
 
-ort_session = ort.InferenceSession('models/banknote_best.onnx')
+ort_session = ort.InferenceSession('app/models/banknote_best.onnx')
 
 
 def transform_image(image_bytes):
     my_transforms = transforms.Compose([transforms.Resize([256, 256]),
-                                        transforms.RandomCrop(32, padding=4),
+                                        transforms.CenterCrop(32),
                                         transforms.ToTensor(),
                                         transforms.Normalize(
                                             [0.485, 0.456, 0.406],
@@ -28,8 +28,11 @@ def get_prediction(image_bytes):
 
 
 if __name__ == "__main__":
-    filename = "data/validation/2reaisVerso/compressed_20_9551306.jpeg"
-    with open(filename, 'rb') as f:
-        image_bytes = f.read()
-        tensor = get_prediction(image_bytes=image_bytes)
-        print(tensor)
+    filename = ["data/validation/2reaisVerso/compressed_20_9551306.jpeg",
+                'data/validation/2reaisVerso/compressed_0_3752849.jpeg',
+                "data/validation/5reaisFrente/compressed_0_1986857.jpeg"]
+    for img in filename:
+        with open(img, 'rb') as f:
+            image_bytes = f.read()
+            tensor = get_prediction(image_bytes=image_bytes)
+            print(tensor)

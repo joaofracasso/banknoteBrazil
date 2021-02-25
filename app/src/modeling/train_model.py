@@ -79,5 +79,5 @@ if __name__ == "__main__":
             epoch_pbar.set_description(desc)
         if running_val_loss < best_val_loss: 
             dummy_input = torch.randn(1, 3, 32, 32).to(device)
-            torch.onnx.export(net, dummy_input, "models/banknote_best.onnx")
+            torch.onnx.export(net, dummy_input, "app/models/banknote_best.onnx")
             best_val_loss = running_val_loss
