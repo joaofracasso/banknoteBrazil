@@ -69,8 +69,8 @@ jobs:
       - name: Create or update lambda function
         run: | 
           aws cloudformation deploy \
-            --stack-name banknotebrazil-lambda-stack \
-            --template-file infra/template.yml \
-            --parameter-overrides file://infra/parameters.json \
-            --capabilities CAPABILITY_NAMED_IAM
+          --stack-name banknotebrazil-lambda-stack \
+          --template-file infra/template.yml \
+          --parameter-overrides file://infra/parameters.json \
+          --capabilities CAPABILITY_NAMED_IAM
 
