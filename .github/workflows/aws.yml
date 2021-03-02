@@ -26,10 +26,8 @@
 name: Depoy on AWS application
 
 on:
-  push:
-    branches: [ dev ]
   pull_request:
-    branches: [ master, dev]
+    branches: [ master]
 
 
 jobs:
