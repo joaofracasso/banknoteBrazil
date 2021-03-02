@@ -6,7 +6,7 @@ from PIL import Image
 import onnxruntime as ort
 import numpy as np
 
-ort_session = ort.InferenceSession('models/banknote_best.onnx')
+ort_session = ort.InferenceSession('app/models/banknote_best.onnx')
 
 class_map = {
     0: "10 Reais Frente",
