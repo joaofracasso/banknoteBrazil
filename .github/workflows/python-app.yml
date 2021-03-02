@@ -39,5 +39,5 @@ jobs:
     - name: Gerenate Report
       run: |
         # script to download validation
-        bash app/src/modeling/evaluate_model.py   
+        python app/src/modeling/evaluate_model.py   
 
