@@ -6,6 +6,7 @@ from PIL import Image
 import onnxruntime as ort
 import numpy as np
 
+
 class_map = {
     0: "10 Reais Frente",
     1: "10 Reais Verso",

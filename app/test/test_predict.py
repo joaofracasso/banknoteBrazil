@@ -4,6 +4,7 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.realpath(__file__)), "../"))
 import onnxruntime as ort
+
 import pytest
 from src.modeling.predict_model import get_prediction
 
