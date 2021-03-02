@@ -31,4 +31,6 @@ if __name__ == "__main__":
         output = np.argmax(output[0], axis=1)[0]
         outputs.append(output)
         labels.append(label.data)
-    print(classification_report(labels, outputs))
+    print(labels)
+    print(outputs)
+    #print(classification_report(labels, outputs))
