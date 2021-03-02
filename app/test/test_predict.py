@@ -1,5 +1,9 @@
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(
+    os.path.realpath(__file__)), "../"))
 import pytest
-from app.src.modeling.predict_model import get_prediction
+from src.modeling.predict_model import get_prediction
 
 files = "data/test/2reaisVerso/compressed_20_9551306.jpeg"
 
