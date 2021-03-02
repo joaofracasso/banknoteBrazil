@@ -27,14 +27,14 @@ name: Depoy on AWS application
 
 on:
   pull_request:
-    branches: [ master]
+    branches: [ master ]
 
 
 jobs:
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest
 
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -64,12 +64,12 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name: Create or update lambda function
-        id: deploy-image
-        run: | 
-          aws cloudformation deploy \
-          --stack-name banknotebrazil-lambda-stack \
-          --template-file infra/template.yml \
-          --parameter-overrides file://infra/parameters.json \
-          --capabilities CAPABILITY_NAMED_IAM
+    - name: Create or update lambda function
+      id: deploy-image
+      run: | 
+        aws cloudformation deploy \
+        --stack-name banknotebrazil-lambda-stack \
+        --template-file infra/template.yml \
+        --parameter-overrides file://infra/parameters.json \
+        --capabilities CAPABILITY_NAMED_IAM
 
