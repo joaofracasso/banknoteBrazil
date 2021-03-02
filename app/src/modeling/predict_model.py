@@ -40,16 +40,17 @@ if __name__ == "__main__":
     
     ort_session = ort.InferenceSession('app/models/banknote_best.onnx')
 
-    filename = ["data/validation/10reaisFrente/compressed_0_2854543.jpeg",
-                "data/validation/10reaisVerso/compressed_0_2175135.jpeg",
-                "data/validation/2reaisFrente/compressed_0_1835891.jpeg",
-                'data/validation/2reaisVerso/compressed_0_3752849.jpeg',
-                "data/validation/5reaisFrente/compressed_0_1986857.jpeg",
-                "data/validation/5reaisVerso/compressed_0_4651610.jpeg",
-                'data/validation/20reaisFrente/compressed_0_1516768.jpeg',
-                'data/validation/20reaisVerso/compressed_0_3080811.jpeg',
-                'data/validation/50reaisFrente/compressed_0_1478513.jpeg',
-                'data/validation/50reaisVerso/compressed_0_3923784.jpeg']
+    filename = [
+        "data/validation/2reaisFrente/compressed_0_1835891.jpeg",
+        'data/validation/2reaisVerso/compressed_0_3752849.jpeg',
+        "data/validation/5reaisFrente/compressed_0_1986857.jpeg",
+        "data/validation/5reaisVerso/compressed_0_4651610.jpeg",
+        "data/validation/10reaisFrente/compressed_0_2854543.jpeg",
+        "data/validation/10reaisVerso/compressed_0_2175135.jpeg",
+        'data/validation/20reaisFrente/compressed_0_1516768.jpeg',
+        'data/validation/20reaisVerso/compressed_0_3080811.jpeg',
+        'data/validation/50reaisFrente/compressed_0_1478513.jpeg',
+        'data/validation/50reaisVerso/compressed_0_3923784.jpeg']
     for img in filename:
         with open(img, 'rb') as f:
             image_bytes = f.read()
