@@ -52,6 +52,7 @@ Resources:
                   - "ec2:DescribeSecurityGroups"
                   - "ec2:DescribeSubnets"
                   - "ec2:DescribeVpcs"
+                  - "ecr:*"
                   - "events:*"
                   - "iam:GetPolicy"
                   - "iam:GetPolicyVersion"
