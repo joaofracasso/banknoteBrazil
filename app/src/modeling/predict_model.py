@@ -6,8 +6,6 @@ from PIL import Image
 import onnxruntime as ort
 import numpy as np
 
-ort_session = ort.InferenceSession('app/models/banknote_best.onnx')
-
 class_map = {
     0: "10 Reais Frente",
     1: "10 Reais Verso",
@@ -30,14 +28,17 @@ def transform_image(image_bytes):
     return my_transforms(image).unsqueeze_(0)
 
 
-def get_prediction(image_bytes):
+def get_prediction(image_bytes, inference_session):
     tensor = transform_image(image_bytes=image_bytes)
-    outputs = ort_session.run(None, {'input.1': tensor.numpy()})
+    outputs = inference_session.run(None, {'input.1': tensor.numpy()})
     y_hat = np.argmax(outputs[0], axis=1)[0]
     return class_map[y_hat]
 
 
 if __name__ == "__main__":
+    
+    ort_session = ort.InferenceSession('app/models/banknote_best.onnx')
+
     filename = ["data/validation/10reaisFrente/compressed_0_2854543.jpeg",
                 "data/validation/10reaisVerso/compressed_0_2175135.jpeg",
                 "data/validation/2reaisFrente/compressed_0_1835891.jpeg",
@@ -51,6 +52,5 @@ if __name__ == "__main__":
     for img in filename:
         with open(img, 'rb') as f:
             image_bytes = f.read()
-            print(image_bytes)
-            tensor = get_prediction(image_bytes=image_bytes)
+            tensor = get_prediction(image_bytes, ort_session)
             print(tensor)
