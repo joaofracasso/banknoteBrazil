@@ -36,3 +36,8 @@ jobs:
       run: |
         # script to download validation
         bash app/src/data/download_validation.sh     
+    - name: Gerenate Report
+      run: |
+        # script to download validation
+        bash app/src/modeling/evaluate_model.py   
+

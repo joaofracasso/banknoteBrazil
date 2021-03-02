@@ -7,13 +7,12 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 
-ort_session = ort.InferenceSession('app/models/banknote_best.onnx')
 data_dir = "data"
 input_size = [224, 224]
 batch_size = 1
 
-
 if __name__ == "__main__":
+    ort_session = ort.InferenceSession('app/models/banknote_best.onnx')
     data_transforms = {
         'validation': transforms.Compose([
             transforms.Resize(input_size),
