@@ -31,7 +31,4 @@ if __name__ == "__main__":
         outputs.append(output)
         labels.append(label.data.tolist())
     labels = sum(labels, [])
-    print(labels)
-    print(outputs)
-
-    #print(classification_report(labels, outputs))
+    print(classification_report(labels, outputs))
