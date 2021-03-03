@@ -32,12 +32,4 @@ jobs:
     - name: Test with pytest
       run: |
         pytest app/test/
-    - name: Download validation set
-      run: |
-        # script to download validation
-        bash app/src/data/download_validation.sh     
-    - name: Gerenate Report
-      run: |
-        # script to download validation
-        python app/src/modeling/evaluate_model.py   
 
