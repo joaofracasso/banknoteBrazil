@@ -16,11 +16,11 @@ jobs:
     - name: Gerenate Report
       run: |
         # script to download validation
-        python app/src/modeling/evaluate_model.py > app/output/results.txt
+        python app/src/modeling/evaluate_model.py > app/results/results.txt
     - uses: actions/upload-artifact@v1
       with:
         name: results
-        path: app/output
+        path: app/results
     - uses: actions/download-artifact@v1
       with:
         name: results
