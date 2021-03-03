@@ -33,4 +33,3 @@ jobs:
       run: |
         pytest app/test/
 
-
