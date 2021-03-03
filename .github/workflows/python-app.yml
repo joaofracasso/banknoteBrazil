@@ -39,5 +39,18 @@ jobs:
     - name: Gerenate Report
       run: |
         # script to download validation
-        python app/src/modeling/evaluate_model.py   
+        python app/src/modeling/evaluate_model.py > output/results.txt
+    - uses: actions/upload-artifact@v1
+      with:
+        name: results
+        path: output
+    - uses: actions/download-artifact@v1
+      with:
+        name: results
+    - name: comment PR
+        uses: machine-learning-apps/pr-comment@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path: results/results.txt
 
