@@ -20,11 +20,11 @@ jobs:
     - name: Download validation set
       run: |
         # script to download validation
-        bash app/src/data/download_validation.sh     
+        bash app/src/datasets/download_validation.sh     
     - name: Gerenate Report
       run: |
         # script to download validation
-        python app/src/modeling/evaluate_model.py > app/results/results.txt
+        python app/evaluate_model.py > app/results/results.txt
     - uses: actions/upload-artifact@v1
       with:
         name: results
