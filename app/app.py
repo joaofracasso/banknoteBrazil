@@ -3,7 +3,7 @@ import json
 
 import onnxruntime as ort
 
-from src.modeling.predict_model import get_prediction
+from predict_model import get_prediction
 
 #lambda invocation
 def lambda_handler(event, context):
