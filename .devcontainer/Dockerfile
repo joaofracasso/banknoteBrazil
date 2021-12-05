@@ -12,6 +12,8 @@ RUN cd /tmp && wget https://bootstrap.pypa.io/get-pip.py && \
 
 RUN python3.8 -m pip install pip -U
 
+RUN python3.8 -m pip install pylint pytest
+
 # [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
 COPY app/requirements.txt /tmp/pip-tmp/
 RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
