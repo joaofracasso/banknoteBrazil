@@ -29,7 +29,7 @@ BanknoteBrazil may be run in any of the following up-to-date verified environmen
 You can train the network with the `train.py` script. For more usage information see [this](train.py). To train with the default parameters:
 
 ```bash
-$ python app/src/modeling/train_model.py
+$ python app/train_model.py
 ```
 
 ### Evaluating the model
@@ -37,7 +37,7 @@ $ python app/src/modeling/train_model.py
 Also, you can evaluate the model against the validation set
 
 ```bash
-$ python app/src/modeling/evaluate_model.py
+$ python app/evaluate_model.py
 ```
 
 ## Predicting the outputs
@@ -45,7 +45,7 @@ $ python app/src/modeling/evaluate_model.py
 To predict the outputs of a trained model using some dataset:
 
 ```bash
-$  python app/src/modeling/predict_model.py --file data/test/2reaisVerso/compressed_20_9551306.jpeg
+$  python app/predict_model.py --file data/test/2reaisVerso/compressed_20_9551306.jpeg
 ```
 
 ## Deploy on lambda container
