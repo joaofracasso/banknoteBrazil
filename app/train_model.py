@@ -3,6 +3,7 @@ from __future__ import division, print_function
 import copy
 import os
 import time
+import wandb
 
 import torch
 import torch.nn as nn
@@ -16,106 +17,79 @@ from src.models import initialize_model
 #   to the ImageFolder structure
 data_dir = "data"
 # Models to choose from [resnet, alexnet, vgg, squeezenet, densenet, inception]
-model_name = "squeezenet"
+model_name = "vgg"
 # Number of classes in the dataset
 num_classes = 10
 # Batch size for training (change depending on how much memory you have)
-batch_size = 16
+batch_size = 8
 # Number of epochs to train for 
 num_epochs = 20
 # Flag for feature extracting. When False, we finetune the whole model, 
 #   when True we only update the reshaped layer params
 feature_extract = True
+learning_rate = 0.001
 
 
-def train_model(model, dataloaders, criterion, optimizer, num_epochs=25, is_inception=False):
-    since = time.time()
+def train(model, device, train_loader, criterion, optimizer, epoch):
+    model.train()
+    train_loss, train_acc = 0.0 , 0.0
+    for batch_idx, _data in enumerate(train_loader):
+        inputs, labels = _data
+        inputs, labels = inputs.to(device), labels.to(device)
+        optimizer.zero_grad()
 
-    val_acc_history = []
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
 
-    best_model_wts = copy.deepcopy(model.state_dict())
-    best_acc = 0.0
+        _, preds = torch.max(outputs, 1)
+        loss.backward()
 
-    for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
-        print('-' * 10)
+        optimizer.step()
 
-        # Each epoch has a training and validation phase
-        for phase in ['train', 'validation']:
-            if phase == 'train':
-                model.train()  # Set model to training mode
-            else:
-                model.eval()   # Set model to evaluate mode
 
-            running_loss = 0.0
-            running_corrects = 0
+        train_loss += loss.item()
+        train_acc += torch.sum(preds == labels.data)
+    
+    print('Epoch {}\tTrain set: Loss: {:.4f}\t Acc: {:.4f}'.format(epoch, train_loss/len(train_loader.dataset), train_acc/len(train_loader.dataset)))
+    return train_loss/len(train_loader.dataset), train_acc/len(train_loader.dataset)
 
-            # Iterate over data.
-            for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
 
-                # zero the parameter gradients
-                optimizer.zero_grad()
+def test(model, device, test_loader, criterion):
+    model.eval()
+    test_loss, test_acc = 0.0, 0.0
+    with torch.no_grad():
+        for i, _data in enumerate(test_loader):
+            inputs, labels = _data
+            inputs, labels = inputs.to(device), labels.to(device)
 
-                # forward
-                # track history if only in train
-                with torch.set_grad_enabled(phase == 'train'):
-                    # Get model outputs and calculate loss
-                    # Special case for inception because in training it has an auxiliary output. In train
-                    #   mode we calculate the loss by summing the final output and the auxiliary output
-                    #   but in testing we only consider the final output.
-                    if is_inception and phase == 'train':
-                        # From https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958
-                        outputs, aux_outputs = model(inputs)
-                        loss1 = criterion(outputs, labels)
-                        loss2 = criterion(aux_outputs, labels)
-                        loss = loss1 + 0.4*loss2
-                    else:
-                        outputs = model(inputs)
-                        loss = criterion(outputs, labels)
 
-                    _, preds = torch.max(outputs, 1)
+            outputs = model(inputs) # (batch, time, n_class)
+            loss = criterion(outputs, labels)
 
-                    # backward + optimize only if in training phase
-                    if phase == 'train':
-                        loss.backward()
-                        optimizer.step()
+            _, preds = torch.max(outputs, 1)
 
-                # statistics
-                running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
-
-            epoch_loss = running_loss / len(dataloaders[phase].dataset)
-            epoch_acc = running_corrects.double() / len(dataloaders[phase].dataset)
-
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
-
-            # deep copy the model
-            if phase == 'validation' and epoch_acc > best_acc:
-                best_acc = epoch_acc
-                best_model_wts = copy.deepcopy(model.state_dict())
-            if phase == 'validation':
-                val_acc_history.append(epoch_acc)
-
-        print()
-
-    time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-    print('Best val Acc: {:4f}'.format(best_acc))
-
-    # load best model weights
-    model.load_state_dict(best_model_wts)
-    return model, val_acc_history
-
+            test_loss += loss.item()
+            test_acc += torch.sum(preds == labels.data)
+            
+    print('\tTest set: Loss: {:.4f}\t Acc: {:.4f}'.format(test_loss/len(test_loader.dataset), test_acc/len(test_loader.dataset)))
+    return test_loss
 
 if __name__ == "__main__":
     # Top level data directory. Here we assume the format of the directory conforms 
+    hparams = {
+        "learning_rate": learning_rate,
+        "batch_size": batch_size,
+        "epochs": num_epochs
+    }
+    best_loss = 9999
+    wandb.init(project="banknote", entity="joaofracasso")
+    torch.manual_seed(7)
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
     model_ft, input_size = initialize_model(model_name, num_classes,
                                             feature_extract, 
                                             use_pretrained=True)  
-    # Assuming that we are on a CUDA machine, this should print a CUDA device:
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+                                            
     # Data augmentation and normalization for training
     # Just normalization for validation
     data_transforms = {
@@ -135,15 +109,10 @@ if __name__ == "__main__":
 
     # Create training and validation datasets
     image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x]) for x in ['train', 'validation']}
-    # Create training and validation dataloaders
-    dataloaders_dict = {x: DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4) for x in ['train', 'validation']}
-    # Send the model to GPU
+    train_loader = DataLoader(image_datasets['train'], batch_size=batch_size, shuffle=True, num_workers=4)
+    test_loader =  DataLoader(image_datasets['validation'], batch_size=batch_size, shuffle=True, num_workers=4)
+    wandb.config = hparams
     model_ft = model_ft.to(device)
-    # Gather the parameters to be optimized/updated in this run. If we are
-    #  finetuning we will be updating all parameters. However, if we are 
-    #  doing feature extract method, we will only update the parameters
-    #  that we have just initialized, i.e. the parameters with requires_grad
-    #  is True.
     params_to_update = model_ft.parameters()
     print("Params to learn:")
     if feature_extract:
@@ -156,27 +125,24 @@ if __name__ == "__main__":
         for name, param in model_ft.named_parameters():
             if param.requires_grad == True:
                 print("\t", name)
+    optimizer_ft = optim.SGD(params_to_update, lr=learning_rate, momentum=0.9)
 
-    # Observe that all parameters are being optimized
-    optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
-    # Setup the loss fxn
-    criterion = nn.CrossEntropyLoss()
-    # Train and evaluate
-    model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name == "inception"))
-    print(input_size)
-    model_ft.eval()
-    outputs = []
-    labels = []
-    for inputs, label in dataloaders_dict["validation"]:
-        inputs = inputs.to(device)
-        output = model_ft(inputs)
-        _, preds = torch.max(output, 1)
-        labels.append(label.data)
-        outputs.append(preds.cpu().numpy())
-    outputs = [a.squeeze().tolist() for a in outputs]
-    labels = [a.squeeze().tolist() for a in labels]
-    outputs = sum(outputs, [])
-    labels = sum(labels, [])
-    print(classification_report(labels, outputs))
-    dummy_input = torch.randn(1, 3, input_size, input_size).to(device)
-    torch.onnx.export(model_ft, dummy_input, "app/models/banknote_best.onnx")
+    criterion = nn.CrossEntropyLoss()   
+    wandb.watch(model_ft) 
+    #model_ft, hist = train_model(model_ft, dataloaders_dict, criterion, optimizer_ft, num_epochs=num_epochs, is_inception=(model_name == "inception"))
+    for epoch in range(1, num_epochs + 1):
+        torch.cuda.empty_cache()
+        train_loss, train_acc = train(model_ft, device, train_loader, criterion, optimizer_ft, epoch)
+        test_loss = test(model_ft, device, test_loader, criterion)
+        wandb.log({
+            "train_loss": train_loss,
+            "train_acc": train_acc,
+            "test_loss": test_loss
+             })
+        if test_loss < best_loss:
+            x = torch.randn(1, 3, input_size, input_size).to(device)
+            torch.onnx.export(model_ft,
+                                x,
+                                "app/models/banknote_best.onnx")
+            wandb.save("app/models/banknote_best.onnx")
+            best_loss = test_loss
