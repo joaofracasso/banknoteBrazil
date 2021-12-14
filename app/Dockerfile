@@ -8,6 +8,7 @@ RUN python3.8 -m pip install -r requirements.txt
 
 # Copy the earlier created app.py file to the container
 COPY app.py ./
+COPY predict_model.py ./
 COPY src ./src
 COPY models/banknote_best.onnx ./models/banknote_best.onnx
 

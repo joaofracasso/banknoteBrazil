@@ -20,6 +20,7 @@ class_map = {
     8: "5Reais Frente",
     9: "5Reais Verso"
             }
+            
 def transform_image(image_bytes):
     my_transforms = transforms.Compose([
             transforms.Resize([224, 224]),
