@@ -17,5 +17,27 @@ RUN python3.8 -m pip install pylint pytest
 # [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
 COPY app/requirements.txt /tmp/pip-tmp/
 RUN python3.8 -m pip --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
-#    && rm -rf /tmp/pip-tmp
+    && rm -rf /tmp/pip-tmp
 
+RUN apt-get update \
+    && apt-get -y install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+RUN echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+RUN apt-get update \
+     && apt-get install -y docker-ce docker-ce-cli containerd.io
+    
+COPY .devcontainer/library-scripts/*.sh /tmp/library-scripts/
+RUN /bin/bash /tmp/library-scripts/docker-in-docker-debian.sh
+
+VOLUME [ "/var/lib/docker" ]
+ENTRYPOINT [ "/usr/local/share/docker-init.sh" ]
+CMD [ "sleep", "infinity" ]
